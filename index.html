@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen Maru Gothic&display=swap">
+</head>
+<body>
+  <!-- タイトル画面 -->
+  <div id="title-screen" class="overlay">
+    <h1 class="neon">TETRIS</h1>
+    <div class="controls neon-text">
+      <div class="control-keys">
+        <p>← →, A D</p>
+        <p>Z, .</p>
+        <p>X, /</p>
+        <p>↑, W</p>
+        <p>↓, S</p>
+        <p>Space</p>
+        <p>C, \</p>
+      </div>
+      <div class="control-desc">
+        <p>… 左右移動</p>
+        <p>… 左回転</p>
+        <p>… 右回転</p>
+        <p>… 右回転</p>
+        <p>… ソフトドロップ</p>
+        <p>… ハードドロップ</p>
+        <p>… ホールド</p>
+      </div>
+    </div>
+    <label class="mobile-mode-label">
+      <input type="checkbox" id="mobile-mode-checkbox">
+      モバイルモード
+    </label>
+    <button id="start-button" class="neon-button">Start</button>
+  </div>
+
+  <!-- ゲーム画面 -->
+  <div class="mobile-game-wrapper hidden">
+    <div class="game-container">
+      <div class="hold-panel">
+        <h2 class="neon-text">Hold</h2>
+        <canvas id="hold-canvas" width="120" height="75"></canvas>
+      </div>
+      <canvas id="game-canvas" width="300" height="600"></canvas>
+      <div class="next-stats">
+        <div class="next-panel">
+          <h2 class="neon-text">Next</h2>
+          <canvas id="next-canvas" width="120" height="520"></canvas>
+        </div>
+        <div class="stats-panel">
+          <div class="score-panel neon-text">
+            <p>Score</p>
+            <div id="score">0</div>
+          </div>
+          <div class="level-panel neon-text">
+            <p>Level</p>
+            <div id="level">1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ゲーム画面直後に操作パネルを追加 -->
+  <div id="mobile-controls" class="mobile-controls hidden">
+    <!-- 1行目：回転 -->
+    <div class="ctrl-row">
+      <button id="btn-rotate-left" class="ctrl-btn" aria-label="左回転">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3L5 7L9 11" />
+          <path d="M5 7H12A5 5 0 1 1 7 19" />
+        </svg>
+      </button>
+      <button id="btn-rotate-right" class="ctrl-btn" aria-label="右回転">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3L19 7L15 11" />
+          <path d="M19 7H12A5 5 0 1 0 17 19" />
+        </svg>
+      </button>
+    </div>
+    <!-- 2行目：左右移動 -->
+    <div class="ctrl-row">
+      <button id="btn-move-left" class="ctrl-btn" aria-label="左移動">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 5L7 12L15 19" />
+        </svg>
+      </button>
+      <button id="btn-move-right" class="ctrl-btn" aria-label="右移動">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 5L17 12L9 19" />
+        </svg>
+      </button>
+    </div>
+    <!-- 3行目：その他 -->
+    <div class="ctrl-row">
+      <button id="btn-hold" class="ctrl-btn" aria-label="ホールド">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12A8 8 0 0 1 12 4L10 2" />
+          <path d="M20 12A8 8 0 0 1 12 20L14 22" />
+        </svg>
+      </button>
+      <button id="btn-soft-drop" class="ctrl-btn" aria-label="ソフトドロップ">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 10L12 16L18 10" />
+        </svg>
+      </button>
+      <button id="btn-hard-drop" class="ctrl-btn" aria-label="ハードドロップ">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8L12 14L18 8" />
+          <path d="M6 14L12 20L18 14" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ゲームオーバー画面 -->
+  <div id="game-over-screen" class="overlay hidden">
+    <h1 class="neon">Game Over</h1>
+    <div class="neon-text">Your Score: <span id="final-score">0</span></div>
+    <button id="retry-button" class="neon-button">Retry</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
