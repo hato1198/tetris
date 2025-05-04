@@ -131,6 +131,7 @@ function addHoldAction(el, action, initialDelay = 500, interval = 100) {
   let startTimer = null, repeatTimer = null;
   const start = (e) => {
     e.preventDefault();
+    el.classList.add('pressed');
     action();
     startTimer = setTimeout(() => {
       repeatTimer = setInterval(action, interval);
@@ -139,6 +140,7 @@ function addHoldAction(el, action, initialDelay = 500, interval = 100) {
   const end = () => {
     clearTimeout(startTimer);
     clearInterval(repeatTimer);
+    el.classList.remove('pressed');
   };
   el.addEventListener('mousedown', start);
   el.addEventListener('touchstart', start);

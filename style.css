@@ -92,14 +92,12 @@ body.mobile-mode .mobile-game-wrapper .game-container {
   stroke-width: 2;
 }
 
-.ctrl-btn:hover,
-.ctrl-btn:active {
+/* 押されたときの一時クラス */
+.ctrl-btn.pressed {
   background: #0ff;
 }
-
-.ctrl-btn:hover svg path,
-.ctrl-btn:active svg path{
-  stroke: #011 !important;
+.ctrl-btn.pressed svg {
+  stroke: #111;
 }
 
 h1.neon {
