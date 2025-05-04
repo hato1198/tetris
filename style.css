@@ -100,7 +100,6 @@ body.mobile-mode .mobile-game-wrapper .game-container {
 .ctrl-btn:hover svg path,
 .ctrl-btn:active svg path{
   stroke: #011 !important;
-  fill:   #000 !important;
 }
 
 h1.neon {
