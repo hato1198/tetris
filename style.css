@@ -43,7 +43,7 @@ body.mobile-mode {
   overflow: hidden;
 }
 body.mobile-mode .mobile-game-wrapper {
-  height: 60vh;
+  height: 70vh;
 }
 body.mobile-mode .mobile-game-wrapper .game-container {
   transform: scale(0.5);
@@ -53,10 +53,10 @@ body.mobile-mode .mobile-game-wrapper .game-container {
 /* 操作パネル */
 .mobile-controls {
   position: absolute;
-  top: 60vh;
+  top: 70vh;
   left: 0;
   width: 100%;
-  height: 40vh;
+  height: 30vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
