@@ -84,6 +84,12 @@ body.mobile-mode .mobile-game-wrapper .game-container {
   align-items: center;
   padding: 0;
 }
+.btn-label {
+  color: #0ff;
+  font-size: 1.1rem;
+  user-select: none;
+  font-family: 'Roboto Condensed', sans-serif;
+}
 .ctrl-btn svg {
   width: 24px;
   height: 24px;
@@ -186,14 +192,7 @@ canvas#game-canvas {
   gap: 0;
 }
 
-.hold-panel, .next-panel {
-  background: #111;
-  padding: 10px;
-  box-shadow: 0 0 20px #0ff;
-  border-radius: 8px;
-}
-
-.score-panel, .level-panel {
+.hold-panel, .next-panel, .score-panel, .level-panel {
   background: #111;
   padding: 10px;
   box-shadow: 0 0 20px #0ff;
