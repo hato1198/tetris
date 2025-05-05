@@ -499,6 +499,13 @@ window.addEventListener('resize', () => {
   }
 });
 
+// 「結果をシェア」ボタンの動作
+document.getElementById('share-button').onclick = () => {
+    const text = encodeURIComponent(`私のテトリスの記録は……\nスコア：${score}点\nレベル：${level}\n\n▼みんなも挑戦してみてね！\nhttps://hato1198.github.io/tetris/`);
+    const url  = `https://x.com/intent/tweet?text=${text}`;
+    window.open(url, '_blank');
+  };
+
 window.addEventListener('keydown', e => {
   if (gameOver) return;
   

@@ -119,6 +119,9 @@ h1.neon {
   margin-top: 0px;
   margin-bottom: 0px;
 }
+h2.neon-text {
+  font-weight: normal;
+}
 
 .controls {
   display: flex;
@@ -160,7 +163,13 @@ h1.neon, .neon-text p, .neon-text {
   background-color: #0ff;
   color: #111;
 }
-
+.twitter-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  margin-right: 0.2em;
+  fill: currentColor;
+}
 .game-container {
   display: flex;
   justify-content: center;
