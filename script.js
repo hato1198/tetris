@@ -129,7 +129,8 @@ function createMatrix(w, h) {
 
 function addHoldAction(el, action, initialDelay = 500, interval = 100) {
   let startTimer = null, repeatTimer = null;
-  const start = (e) => {
+  const onPointerDown = (e) => {
+    // タッチ時のブラウザスクロール等を抑制
     e.preventDefault();
     el.classList.add('pressed');
     action();
@@ -137,16 +138,15 @@ function addHoldAction(el, action, initialDelay = 500, interval = 100) {
       repeatTimer = setInterval(action, interval);
     }, initialDelay);
   };
-  const end = () => {
+  const onPointerUpOrLeave = () => {
     clearTimeout(startTimer);
     clearInterval(repeatTimer);
     el.classList.remove('pressed');
   };
-  el.addEventListener('mousedown', start);
-  el.addEventListener('touchstart', start);
-  el.addEventListener('mouseup', end);
-  el.addEventListener('mouseleave', end);
-  el.addEventListener('touchend', end);
+  // Pointer Events でまとめて
+  el.addEventListener('pointerdown', onPointerDown, { passive: false });
+  el.addEventListener('pointerup',   onPointerUpOrLeave);
+  el.addEventListener('pointerleave', onPointerUpOrLeave);
 }
 
 function initGame() {
@@ -472,10 +472,19 @@ window.addEventListener('load', () => {
 });
 
 function adjustGameScale() {
-  const wrapper = document.querySelector('.mobile-game-wrapper');
+  const wrapper   = document.querySelector('.mobile-game-wrapper');
   const container = wrapper.querySelector('.game-container');
-  const scale = Math.min(1, window.innerWidth / container.offsetWidth);
-  container.style.transform = `scale(${scale})`;
+
+  // 横幅に合わせた縮小率
+  const widthRatio  = window.innerWidth  / container.offsetWidth;
+  // wrapper の高さは 70vh (= window.innerHeight * 0.7)
+  const maxHeight   = window.innerHeight * 0.7;
+  const heightRatio = maxHeight / container.offsetHeight;
+
+  // 両方に収まる縮小率を計算
+  const scale = Math.min(1, widthRatio, heightRatio);
+
+  container.style.transform       = `scale(${scale})`;
   container.style.transformOrigin = 'center center';
 }
 
