@@ -99,8 +99,11 @@ body.mobile-mode .mobile-game-wrapper .game-container {
 }
 
 /* 押されたときの一時クラス */
-.ctrl-btn.pressed {
+.ctrl-btn.pressed{
   background: #0ff;
+}
+.ctrl-btn.pressed .btn-label {
+  color: #111;
 }
 .ctrl-btn.pressed svg {
   stroke: #111;
