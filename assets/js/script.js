@@ -123,6 +123,23 @@ const kicks = {
   }
 };
 
+const sounds = {
+  move:       document.getElementById('sound-move'),
+  rotate:     document.getElementById('sound-rotate'),
+  'soft-drop':document.getElementById('sound-soft-drop'),
+  'hard-drop':document.getElementById('sound-hard-drop'),
+  hold:       document.getElementById('sound-hold'),
+  clear:      document.getElementById('sound-clear'),
+  gameover:   document.getElementById('sound-gameover'),
+  click:      document.getElementById('sound-click'),
+};
+function playSound(key) {
+  const s = sounds[key];
+  if (!s) return;
+  s.currentTime = 0;
+  s.play();
+}
+
 function createMatrix(w, h) {
   return Array.from({ length: h }, () => Array(w).fill(0));
 }
@@ -190,26 +207,38 @@ function startGame(){
 }
 
 function registerMobileControls() {
-  const btnRotateLeft = document.getElementById('btn-rotate-left');
-  addHoldAction(btnRotateLeft, () => rotatePiece(currentPiece, -1));
-
+  const btnRotateLeft  = document.getElementById('btn-rotate-left');
   const btnRotateRight = document.getElementById('btn-rotate-right');
-  addHoldAction(btnRotateRight, () => rotatePiece(currentPiece, 1));
+  const btnMoveLeft    = document.getElementById('btn-move-left');
+  const btnMoveRight   = document.getElementById('btn-move-right');
+  const btnSoftDrop    = document.getElementById('btn-soft-drop');
+  const btnHardDrop    = document.getElementById('btn-hard-drop');
+  const btnHold        = document.getElementById('btn-hold');
 
-  const btnMoveLeft = document.getElementById('btn-move-left');
+  addHoldAction(btnRotateLeft, () => {
+    playSound('rotate');
+    rotatePiece(currentPiece, -1);
+  });
+
+  addHoldAction(btnRotateRight, () => {
+    playSound('rotate');
+    rotatePiece(currentPiece, 1);
+  });
+
   addHoldAction(btnMoveLeft, () => {
+    playSound('move');
     currentPiece.pos.x--;
     if (collide(currentPiece)) currentPiece.pos.x++;
   });
 
-  const btnMoveRight = document.getElementById('btn-move-right');
   addHoldAction(btnMoveRight, () => {
+    playSound('move');
     currentPiece.pos.x++;
     if (collide(currentPiece)) currentPiece.pos.x--;
   });
 
-  const btnSoftDrop = document.getElementById('btn-soft-drop');
   addHoldAction(btnSoftDrop, () => {
+    playSound('soft-drop');
     currentPiece.pos.y++;
     if (collide(currentPiece)) {
       currentPiece.pos.y--;
@@ -220,8 +249,8 @@ function registerMobileControls() {
     dropCounter = 0;
   });
 
-  const btnHardDrop = document.getElementById('btn-hard-drop');
   addHoldAction(btnHardDrop, () => {
+    playSound('hard-drop');
     while (!collide(currentPiece)) currentPiece.pos.y++;
     currentPiece.pos.y--;
     merge();
@@ -230,19 +259,26 @@ function registerMobileControls() {
     dropCounter = 0;
   });
 
-  const btnHold = document.getElementById('btn-hold');
-  addHoldAction(btnHold, hold);
+  addHoldAction(btnHold, () => {
+    playSound('hold');
+    hold();
+  });
 }
 
 function endGame() {
+  playSound('gameover');
   gameOver = true;
   finalScoreEl.textContent = score;
   gameOverScreen.classList.remove('hidden');
   document.getElementById('mobile-controls').classList.add('hidden');
 }
 
-startButton.onclick = startGame;
+startButton.onclick = () => {
+  playSound('click');
+  startGame();
+};
 retryButton.onclick = () => {
+  playSound('click');
   gameOverScreen.classList.add('hidden');
   titleScreen.classList.remove('hidden');
   document.body.classList.remove('mobile-mode');
@@ -375,6 +411,7 @@ function sweepRows() {
     }
   }
   if (count) {
+    playSound('clear');
     score += count * 100;
     level = Math.floor(score / 500) + 1;
     scoreEl.textContent = score;
@@ -502,6 +539,7 @@ window.addEventListener('resize', () => {
 
 // 「結果をシェア」ボタンの動作
 document.getElementById('share-button').onclick = () => {
+    playSound('click');
     const text = encodeURIComponent(`私のテトリスの記録は……\nスコア：${score}点\nレベル：${level}\n\n▼みんなも挑戦してみてね！\nhttps://hato1198.github.io/tetris/`);
     const url  = `https://x.com/intent/tweet?text=${text}`;
     window.open(url, '_blank');
@@ -520,16 +558,19 @@ window.addEventListener('keydown', e => {
   switch (e.key) {
     case 'ArrowLeft':
     case 'a':
+      playSound('move');
       currentPiece.pos.x--;
       if (collide(currentPiece)) currentPiece.pos.x++;
       break;
     case 'ArrowRight':
     case 'd':
+      playSound('move');
       currentPiece.pos.x++;
       if (collide(currentPiece)) currentPiece.pos.x--;
       break;
     case 'ArrowDown':
     case 's':
+      playSound('soft-drop');
       currentPiece.pos.y++;
       if (collide(currentPiece)) {
         currentPiece.pos.y--;
@@ -541,15 +582,18 @@ window.addEventListener('keydown', e => {
       break;
     case 'z':
     case '.':
+      playSound('rotate');
       rotatePiece(currentPiece, -1);
       break;
     case 'x':
     case '/':
     case 'ArrowUp':
     case 'w':
+      playSound('rotate');
       rotatePiece(currentPiece, 1);
       break;
     case ' ':
+      playSound('hard-drop');
       while (!collide(currentPiece)) currentPiece.pos.y++;
       currentPiece.pos.y--;
       merge();
@@ -559,6 +603,7 @@ window.addEventListener('keydown', e => {
       break;
     case 'c':
     case '\\':
+      playSound('hold');
       hold();
       break;
   }
