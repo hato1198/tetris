@@ -186,6 +186,7 @@ function startGame(){
   holdPiece = null;
   canHold = true;
   updateHold();
+  adjustGameScale();
 }
 
 function registerMobileControls() {
@@ -477,12 +478,14 @@ function adjustGameScale() {
 
   // 横幅に合わせた縮小率
   const widthRatio  = window.innerWidth  / container.offsetWidth;
-  // wrapper の高さは 70vh (= window.innerHeight * 0.7)
-  const maxHeight   = window.innerHeight * 0.7;
+  // wrapper の高さは モバイルなら 70vh、それ以外は 90vh (= window.innerHeight * 0.7, 0.9)
+  const maxHeight = document.body.classList.contains('mobile-mode')
+    ? window.innerHeight * 0.7
+    : window.innerHeight * 0.9;
   const heightRatio = maxHeight / container.offsetHeight;
-
+  
   // 両方に収まる縮小率を計算
-  const scale = Math.min(1, widthRatio, heightRatio);
+  const scale = Math.min(widthRatio, heightRatio);
 
   container.style.transform       = `scale(${scale})`;
   container.style.transformOrigin = 'center center';
@@ -494,9 +497,7 @@ window.addEventListener('load', () => {
   adjustGameScale();
 });
 window.addEventListener('resize', () => {
-  if (document.body.classList.contains('mobile-mode')) {
-    adjustGameScale();
-  }
+  adjustGameScale();
 });
 
 // 「結果をシェア」ボタンの動作
