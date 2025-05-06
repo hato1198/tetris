@@ -495,6 +495,25 @@ function drawGhost() {
 
 function update(time = 0) {
   if (!gameStarted || gameOver) return;
+  if (isClearing) {
+    // 行消去中は物理更新を行わず、ボード＆パーティクルだけ描いて終わる
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawMatrix(board, ctx, { x: 0, y: 0 });
+    particles = particles.filter(p => p.alpha > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+    // ポーズ表示もここで
+    if (paused) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0ff';
+      ctx.font = '36px Verdana';
+      ctx.fillText('Paused', canvas.width / 2 - 60, canvas.height / 2);
+    }
+    // 次のフレームも待機
+    return requestAnimationFrame(update);
+  }
+  
   const delta = time - lastTime;
   lastTime = time;
 
