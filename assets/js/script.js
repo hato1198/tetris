@@ -22,6 +22,7 @@ let particles = [];
 let ghosts = true;
 let paused = false, gameStarted = false, gameOver = false;
 let mobileControlsRegistered = false;
+let isClearing = false;    // 行消去の待機中フラグ
 
 // Particle for line clear effect
 class Particle {
@@ -50,6 +51,12 @@ class Particle {
 
 // Block ID to type mapping
 const idToType = {1:'I',2:'J',3:'L',4:'O',5:'S',6:'T',7:'Z'};
+
+// 7種類のミノID
+const TETROMINO_TYPES = ['I','J','L','O','S','T','Z'];
+// 7-バッグ用の配列
+let bag = [];
+
 // Standard colors
 const colors = { I:'#00FFFF', J:'#0000FF', L:'#FFA500', O:'#FFFF00', S:'#00FF00', T:'#800080', Z:'#FF0000' };
 
@@ -206,6 +213,22 @@ function startGame(){
   adjustGameScale();
 }
 
+// バッグをシャッフルして詰め替える
+function refillBag() {
+  bag = TETROMINO_TYPES.slice();
+  // Fisher–Yates でシャッフル
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+}
+
+// バッグから次のタイプを取り出す
+function getNextType() {
+  if (bag.length === 0) refillBag();
+  return bag.shift();
+}
+
 function registerMobileControls() {
   const btnRotateLeft  = document.getElementById('btn-rotate-left');
   const btnRotateRight = document.getElementById('btn-rotate-right');
@@ -244,7 +267,6 @@ function registerMobileControls() {
       currentPiece.pos.y--;
       merge();
       sweepRows();
-      playerReset();
     }
     dropCounter = 0;
   });
@@ -255,7 +277,6 @@ function registerMobileControls() {
     currentPiece.pos.y--;
     merge();
     sweepRows();
-    playerReset();
     dropCounter = 0;
   });
 
@@ -293,12 +314,12 @@ function randomPieceType() {
 }
 
 function spawnPiece() {
-  const type = randomPieceType();
+  const type = getNextType();
   return {
     type,
-    dir: 0,
+    dir:    0,
     matrix: PIECES[type][0],
-    pos: { x: 3, y: type === 'I' ? -1 : 0 }
+    pos:    { x: 3, y: type === 'I' ? -1 : 0 }
   };
 }
 
@@ -317,39 +338,52 @@ function updateHold() {
 function hold() {
   if (!canHold) return;
   canHold = false;
+
   if (!holdPiece) {
-      holdPiece = { 
-          type: currentPiece.type, 
-          matrix: PIECES[currentPiece.type][0],
-          dir: 0
-      };
-      currentPiece = nextPieces.shift();
-      currentPiece.pos = { x: 3, y: currentPiece.type === 'I' ? -1 : 0 };
-      currentPiece.dir = 0;
-      currentPiece.matrix = PIECES[currentPiece.type][0];
+    // 初回ホールド時
+    holdPiece = { 
+      type: currentPiece.type, 
+      matrix: PIECES[currentPiece.type][0],
+      dir: 0
+    };
+    // NEXT キューから１個取り出して currentPiece に
+    currentPiece = nextPieces.shift();
+    // 取り出したぶんだけすぐ補充しておく
+    nextPieces.push(spawnPiece());
   } else {
-      const temp = { 
-          type: currentPiece.type, 
-          matrix: PIECES[currentPiece.type][0],
-          dir: 0
-      };
-      currentPiece = {
-          type: holdPiece.type,
-          matrix: PIECES[holdPiece.type][0],
-          pos: { x: 3, y: holdPiece.type === 'I' ? -1 : 0 },
-          dir: 0
-      };
-      holdPiece = temp;
+    // ２回目以降は普段通りスワップ
+    const temp = { 
+      type: currentPiece.type, 
+      matrix: PIECES[currentPiece.type][0],
+      dir: 0
+    };
+    currentPiece = {
+      type: holdPiece.type,
+      matrix: PIECES[holdPiece.type][0],
+      pos: { x: 3, y: holdPiece.type === 'I' ? -1 : 0 },
+      dir: 0
+    };
+    holdPiece = temp;
   }
+
+  // ホールド枠とネクスト枠を再描画
   updateHold();
+  updateNext();
+
+  // currentPiece の初期位置セット
+  currentPiece.pos = { x: 3, y: currentPiece.type === 'I' ? -1 : 0 };
+
   if (collide(currentPiece)) endGame();
 }
 
 function playerReset() {
-  while (nextPieces.length < 7) nextPieces.push(spawnPiece());
+  // nextPieces が常に最低7個になるよう、spawnPiece() でバッグから補充
+  while (nextPieces.length < 7) {
+    nextPieces.push(spawnPiece());
+  }
   currentPiece = nextPieces.shift();
-  canHold = true;
-  currentPiece.dir = 0;
+  canHold      = true;
+  currentPiece.dir    = 0;
   currentPiece.matrix = PIECES[currentPiece.type][0];
   if (collide(currentPiece)) endGame();
   updateNext();
@@ -417,7 +451,20 @@ function sweepRows() {
     scoreEl.textContent = score;
     levelEl.textContent = level;
     dropInterval = Math.max(100, 1000 - (level - 1) * 50);
+
+    // 行消去中フラグを立てる
+    isClearing = true;
+
+    // ライン消去後の待機時間（200ms）
+    const clearDelay = 400;  // ここはスピードカーブに応じて調整
+    setTimeout(() => {
+      playerReset();  // 次ミノの生成タイミングを遅延
+      isClearing = false;// フラグ解除
+    }, clearDelay);
+    return;
   }
+  // 消去行がない場合は即時生成
+  playerReset();
 }
 
 function drawGrid() {
@@ -450,7 +497,7 @@ function update(time = 0) {
   if (!gameStarted || gameOver) return;
   const delta = time - lastTime;
   lastTime = time;
-  
+
   if (!paused) {
     dropCounter += delta;
     if (dropCounter > dropInterval) {
@@ -459,24 +506,36 @@ function update(time = 0) {
         currentPiece.pos.y--;
         merge();
         sweepRows();
-        playerReset();
       }
       dropCounter = 0;
     }
   }
-  
+
+  // 1) 画面クリア
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 2) グリッドを描く
   drawGrid();
-  if (ghosts) drawGhost();
+
+  // 3) ボードを描く
   drawMatrix(board, ctx, { x: 0, y: 0 });
-  drawMatrix(currentPiece.matrix, ctx, currentPiece.pos);
-  
+
+  // 4) クリア待機中でなければ、ゴーストと本体ミノを描く
+  if (!isClearing) {
+    if (ghosts) {
+      drawGhost();
+    }
+    drawMatrix(currentPiece.matrix, ctx, currentPiece.pos);
+  }
+
+  // 5) パーティクルを更新・描画
   particles = particles.filter(p => p.alpha > 0);
   particles.forEach(p => {
     p.update();
     p.draw();
   });
-  
+
+  // 6) ポーズ文字など
   if (paused) {
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -484,7 +543,7 @@ function update(time = 0) {
     ctx.font = '36px Verdana';
     ctx.fillText('Paused', canvas.width / 2 - 60, canvas.height / 2);
   }
-  
+
   if (!gameOver) requestAnimationFrame(update);
 }
 
@@ -576,7 +635,6 @@ window.addEventListener('keydown', e => {
         currentPiece.pos.y--;
         merge();
         sweepRows();
-        playerReset();
       }
       dropCounter = 0;
       break;
@@ -598,7 +656,6 @@ window.addEventListener('keydown', e => {
       currentPiece.pos.y--;
       merge();
       sweepRows();
-      playerReset();
       dropCounter = 0;
       break;
     case 'c':
