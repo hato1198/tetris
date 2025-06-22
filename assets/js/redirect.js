@@ -34,7 +34,7 @@
 
   // 現在のホスト名がGitHub Pagesのものと一致するか判定
   if (window.location.hostname === GITHUB_HOST) {
-    const countdownSeconds = 5; // リダイレクトまでの秒数
+    const countdownSeconds = 10; // リダイレクトまでの秒数
 
     // 新しいURLを構築
     // パスからリポジトリ名を削除（必要な場合）
