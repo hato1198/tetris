@@ -61,7 +61,7 @@
             :root {
               --bg-color: #121212;
               --text-color: #eee;
-              --link-color: #64b5f6;
+              --link-color: #3298fb;
               --border-color: #444;
             }
           }
