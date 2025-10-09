@@ -1,1 +1,1 @@
-This is TETRIS!!
+This is Tetris.

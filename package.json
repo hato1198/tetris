@@ -1,0 +1,28 @@
+{
+  "name": "tetris",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hato1198/tetris.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hato1198/tetris/issues"
+  },
+  "homepage": "https://github.com/hato1198/tetris#readme",
+  "description": "",
+  "dependencies": {
+    "vercel": "^48.2.6",
+    "vite": "^7.1.9",
+    "vite-plugin-html-minifier-terser": "^3.8.0"
+  }
+}
