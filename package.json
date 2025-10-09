@@ -21,7 +21,8 @@
   "homepage": "https://github.com/hato1198/tetris#readme",
   "description": "",
   "devDependencies": {
-    "vite": "^7.1.9",
+    "vercel": "^48.2.6",
+    "vite": "^7.0.4",
     "vite-plugin-html-minifier-terser": "^3.8.0"
   }
 }
