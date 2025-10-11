@@ -12,6 +12,9 @@ const gameContainer = document.querySelector('.game-container');
 const gameOverScreen = document.getElementById('game-over-screen');
 const retryButton = document.getElementById('retry-button');
 const finalScoreEl = document.getElementById('final-score');
+const leaderboardModal = document.getElementById('leaderboard-modal');
+const leaderboardButton = document.getElementById('leaderboard-button');
+const closeButton = document.querySelector('.close-button');
 
 const COLS = 10, ROWS = 20, BLOCK = 30;
 let board, score, level;
@@ -292,6 +295,26 @@ function endGame() {
   finalScoreEl.textContent = score;
   gameOverScreen.classList.remove('hidden');
   document.getElementById('mobile-controls').classList.add('hidden');
+
+  fetch('/api/update-score', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ score }),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.percentile) {
+      const percentileEl = document.getElementById('percentile');
+      percentileEl.textContent = `あなたの順位: 上位${data.percentile}%（推定）`;
+    }
+  })
+  .catch(err => {
+    console.error('Failed to update score', err);
+    const percentileEl = document.getElementById('percentile');
+    percentileEl.textContent = 'スコアの送信に失敗しました。';
+  });
 }
 
 startButton.onclick = () => {
@@ -305,6 +328,53 @@ retryButton.onclick = () => {
   document.body.classList.remove('mobile-mode');
   if (document.body.classList.contains('mobile-mode')) {
     document.getElementById('mobile-controls').classList.remove('hidden');
+  }
+};
+
+leaderboardButton.onclick = () => {
+  playSound('click');
+  leaderboardModal.classList.remove('hidden');
+  fetch('/api/get-leaderboard')
+    .then(res => res.json())
+    .then(data => {
+      updateLeaderboardUI('weekly-leaderboard', data.weekly);
+      updateLeaderboardUI('total-leaderboard', data.allTime);
+    })
+    .catch(err => {
+      console.error('Failed to fetch leaderboard', err);
+      document.getElementById('weekly-leaderboard').innerHTML = '<li>リーダーボードの取得に失敗しました。</li>';
+      document.getElementById('total-leaderboard').innerHTML = '<li>リーダーボードの取得に失敗しました。</li>';
+    });
+};
+
+function updateLeaderboardUI(elementId, leaderboardData) {
+  const list = document.getElementById(elementId);
+  list.innerHTML = '';
+  if (leaderboardData && leaderboardData.length > 0) {
+    leaderboardData.forEach(item => {
+      const li = document.createElement('li');
+      const rank = document.createElement('span');
+      rank.textContent = `${item.rank}位`;
+      const score = document.createElement('span');
+      score.textContent = `${item.score}点`;
+      li.appendChild(rank);
+      li.appendChild(score);
+      list.appendChild(li);
+    });
+  } else {
+    list.innerHTML = '<li>まだ記録がありません。</li>';
+  }
+}
+
+closeButton.onclick = () => {
+  playSound('click');
+  leaderboardModal.classList.add('hidden');
+};
+
+window.onclick = (event) => {
+  if (event.target == leaderboardModal) {
+    playSound('click');
+    leaderboardModal.classList.add('hidden');
   }
 };
 
